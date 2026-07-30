@@ -1,9 +1,12 @@
-import { Dashboard } from "@/components/dashboard";
-import { getDashboardData } from "@/lib/data";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { DashboardProvider } from "@/lib/dashboard-context";
+import { AppShell } from "@/components/app-shell";
 
-export default async function HomePage() {
-  const data = await getDashboardData();
-  return <Dashboard data={data} />;
+export default function HomePage() {
+  return (
+    <DashboardProvider>
+      <AppShell />
+    </DashboardProvider>
+  );
 }

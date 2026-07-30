@@ -1,95 +1,58 @@
-# Pulse — Personal Productivity Dashboard
+# Pulse — Personal Life Dashboard
 
-A Next.js 14 (App Router) productivity dashboard with Neon Postgres persistence, ready for Vercel.
+A Next.js 14 (App Router) personal life dashboard with Neon Postgres persistence, ready for Vercel — inspired by Casey Danielle’s life-dashboard workflow.
 
-## Features
+## What’s included
 
-- **Tasks** — priorities, due dates, focus / done workflow
-- **Habits** — daily check-ins with streak tracking
-- **Notes** — quick capture scratchpad
-- **Goals** — progress tracking with incremental updates
-- **Overview stats** — open tasks, habits completed, done today, goals on track
+- **Week view** — checklist (with confetti + pop sound), gym tracker, weekly focus, reflections, currently reading, Google Calendar events, week navigation
+- **Habits** — weekly grid (daily + devotional), custom icons/colors/goals, score ring, manage modal
+- **Quarter** — credit cards & savings, quarterly goals by category, achievements, parking lot, books finished, 13-week gym chart
+- **Year** — vision / non-negotiables / focus / change, theme buckets, yearly goals
+- **Bucket list** — filterable categories with progress
+- **Open Library** book search
+- **Google Calendar** OAuth sync
+- **Twilio SMS** morning briefing + `done 1 2` / `done all` replies
+- **Vercel Cron** at 12:00 UTC (8am ET) for the briefing
 
-## Stack
+## Architecture note
 
-- Next.js 14 App Router + Server Actions
-- Drizzle ORM + `@neondatabase/serverless`
-- Tailwind CSS (custom theme)
-- Vercel deployment
+Dashboard state is stored as **one flexible JSON object per user** in Neon (`dashboard_state.data`). Adding features means adding keys — no table reshuffles. Autosave on the client is throttled (~650ms) so edits persist without hammering the DB.
 
 ## Setup
 
-### 1. Install
-
 ```bash
 npm install
-```
-
-### 2. Create a Neon database
-
-1. Create a project at [neon.tech](https://neon.tech)
-2. Copy the connection string
-3. Create `.env.local`:
-
-```bash
 cp .env.example .env.local
 ```
 
-Set:
+Set `DATABASE_URL`, then either:
 
-```env
-DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB?sslmode=require
-```
-
-### 3. Apply the schema
-
-Either push with Drizzle:
-
-```bash
-npm run db:push
-```
-
-Or run the SQL migration in the Neon SQL editor:
-
-```text
-drizzle/0000_init.sql
-```
-
-### 4. Run locally
+- open the app once (tables auto-create on first request), or
+- run `npm run db:push`, or
+- apply `drizzle/0000_init.sql` in the Neon SQL editor
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). If the database is empty, use **Load sample data** on the dashboard.
-
 ## Deploy on Vercel
 
-1. Push this repo to GitHub
-2. Import the project in [Vercel](https://vercel.com)
-3. Add the `DATABASE_URL` environment variable (Neon → Vercel integration works well)
-4. Deploy
+1. Import the repo
+2. Add env vars from `.env.example`
+3. Deploy
+4. For SMS replies, point your Twilio webhook to `/api/sms/inbound`
+5. For Google Calendar, set `GOOGLE_REDIRECT_URI` to exactly  
+   `https://YOUR_DOMAIN/api/auth/google/callback`  
+   and enable offline access (`prompt=consent` is already wired)
 
-The app uses `dynamic = "force-dynamic"` so pages always read fresh data from Neon at request time.
+### Cron auth
 
-## Scripts
+If `CRON_SECRET` is set, Vercel Cron should send:
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Local development server |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm run db:push` | Push schema to Neon |
-| `npm run db:generate` | Generate Drizzle migrations |
-| `npm run db:studio` | Open Drizzle Studio |
-
-## Project layout
-
-```text
-src/
-  app/           # App Router pages + server actions
-  components/    # Dashboard UI
-  db/            # Drizzle schema + Neon client
-  lib/           # Data access helpers
-drizzle/         # SQL migration
+```http
+Authorization: Bearer $CRON_SECRET
 ```
+
+## Environment variables
+
+See `.env.example` for the full list (Neon, Google, Twilio, Cron).

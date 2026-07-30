@@ -10,12 +10,9 @@ export function getDb() {
   const connectionString = process.env.DATABASE_URL?.trim();
   if (!connectionString) {
     throw new Error(
-      "DATABASE_URL is not set. Add your Neon Postgres connection string to continue.",
+      "DATABASE_URL is not set. Add your Neon Postgres connection string.",
     );
   }
-
   const sql = neon(connectionString);
   return drizzle(sql, { schema });
 }
-
-export type Database = ReturnType<typeof getDb>;

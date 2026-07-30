@@ -9,14 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#142033",
-        mist: "#e7eef5",
-        teal: "#1fa7a0",
-        accent: "#2f6fed",
+        brown: "#785b4e",
+        sage: "#7a816c",
+        blush: "#d68d84",
+        sand: "#cfbb9f",
+        cream: "#f6efdf",
       },
       fontFamily: {
-        display: ["Syne", "sans-serif"],
-        body: ["Figtree", "sans-serif"],
+        display: ["Fraunces", "Georgia", "serif"],
+        body: ["Source Sans 3", "sans-serif"],
       },
     },
   },
